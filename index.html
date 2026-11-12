@@ -84,7 +84,7 @@
 
     // 1. Registrar cuenta nueva en Supabase Auth
     async function registrar() {
-      const { error } = await supabase.auth.signUp({
+      const { error } = await sb.auth.signUp({
         email: val('email'),
         password: val('pass')
       });
@@ -94,7 +94,7 @@
 
     // 2. Iniciar sesión con correo y contraseña
     async function entrar() {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await sb.auth.signInWithPassword({
         email: val('email'),
         password: val('pass')
       });
@@ -104,7 +104,7 @@
 
     // 3. Mostrar panel protegido y cargar datos
     async function mostrarApp() {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await sb.auth.getUser();
       if (!user) return;
 
       document.getElementById('seccion-login').classList.add('oculto');
@@ -115,7 +115,7 @@
 
     // 4. Al cargar la página, verificar si ya existe sesión activa
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await sb.auth.getSession();
       if (session) mostrarApp();
     })();
 
@@ -125,8 +125,8 @@
       const monto = val('monto');
       if (!titulo || !monto) return msg('ms', 'Completa título y monto', false);
 
-      const { data: { user } } = await supabase.auth.getUser();
-      const { error } = await supabase
+      const { data: { user } } = await sb.auth.getUser();
+      const { error } = await sb
         .from('solicitudes')
         .insert({ titulo, monto, usuario_email: user.email });
 
@@ -140,7 +140,7 @@
 
     // Listar solicitudes en la tabla
     async function cargarSolicitudes() {
-      const { data } = await supabase
+      const { data } = await sb
         .from('solicitudes')
         .select('*')
         .order('id', { ascending: false });
@@ -160,7 +160,7 @@
 
     // 6. Cerrar sesión y volver al formulario de login
     async function salir() {
-      await supabase.auth.signOut();
+      await sb.auth.signOut();
       document.getElementById('seccion-app').classList.add('oculto');
       document.getElementById('seccion-login').classList.remove('oculto');
       msg('ml', 'Sesión cerrada', true);
